@@ -11,20 +11,44 @@ knitr::opts_chunk$set(echo = TRUE)
 library(plotly)
 ```
 
-### R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+### submissions
 
-```{r cars}
-summary(cars)
+
+
+
+### Visualization
+
+```{r}
+
+
+
+
+
 ```
 
-### Including Plots
 
-You can also embed plots, for example:
+### Week 6: Software Setup & Music Information Retrieval
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+
+### Week 7: Fourier Analysis & Data Visualisation
+
+
+### Week 8: Audio Features & Dynamic Time Warping
+
+
+### Week 9: Structure Analysis & Self-Similarity MAtrices
+
+
+### Week 10: Key and Chord Estimation
+
+
+### Week 11: Beat Tracking
+
+
+### Week 12: Similarity & Classification and Clustering
+
+
+### Week 13: Exam and Final Portfolio
+
