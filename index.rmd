@@ -36,7 +36,7 @@ Below is a chroma-based self-similarity matrix of the second song I have submitt
 
 ### Submissions
 
-This page will contain information about how my submissions to the class corpus were generated. Right now it is empty since I only wrote this information down in a submission comment on the course Canvas page, which I cannot read anymore since I have since re-submitted the .mp3 files. I will ask the professor or TA about this before or after next week's lecture, hoping that they can see older submissions on Canvas.
+Using Stable Audio, after generating 4 songs using my own prompts yielded unconvincing results, I decided to stick to prompt libraries offered. Both songs were generated using the Stable Audio AudioSparx 2.0 model with a desired duration of 3 minutes. To generate the first track, I used the prompt “Lofi hip hop beat, chillhop” from the Chillhop prompt library. To generate the second track, I used all of the promps from the Epic Rock prompt library, resulting in the final prompt “Post-Rock, Guitars, Drum Kit, Bass, Strings, Euphoric, Up-Lifting, Moody, Flowing, Raw, Epic, Sentimental, 125 BPM”
 
 
 
