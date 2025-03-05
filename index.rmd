@@ -1,54 +1,92 @@
 ---
-title: "Computational Musicology"
-date: "2025-02-12"
+title: "My Computational Musicology Dashboard"
+date: 
 output: 
   flexdashboard::flex_dashboard:
     storyboard: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(plotly)
+library(tidyverse)
+source("compmus.R")
 ```
 
+### Chroma-Based Self-Similarity Matrix (Newest Tab)
 
-
-### submissions
-
-
-
-
-### Visualization
+Below is a chroma-based self-similarity matrix of the second song I have submitted. The relatively dark square starting at about 65 seconds and spanning across the next 25 seconds or so represents the middle part of the track, signaling a relatively "stable" repeated part. After about 100 seconds, the track becomes more "chaotic" with most parts not resembling any other part of the track. The thick green line at the end/top tells us that the final 15 seconds of the track are completely different from any other parts before it, but the very dark square at the top right of the graph illustrates that this ending part is internally very consistent chroma-wise. In other words, the final few seconds of the track all sound very similar to eachother.
 
 ```{r}
 
-
-
-
+"features/bram-d-2.json" |>                           # Change the track
+  compmus_chroma(norm = "identity") |>                 # Change the norm
+  compmus_self_similarity(
+    feature = pc,
+    distance = "euclidean"                             # Change the distance
+  ) |>   
+  ggplot(aes(x = xtime, y = ytime, fill = d)) + 
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                                      # Change the theme?
 
 ```
 
 
-### Week 6: Software Setup & Music Information Retrieval
+### Submissions
+
+This page will contain information about how my submissions to the class corpus were generated. Right now it is empty since I only wrote this information down in a submission comment on the course Canvas page, which I cannot read anymore since I have since re-submitted the .mp3 files. I will ask the professor or TA about this before or after next week's lecture, hoping that they can see older submissions on Canvas.
 
 
-### Week 7: Fourier Analysis & Data Visualisation
+
+### Visualization old
 
 
-### Week 8: Audio Features & Dynamic Time Warping
+```{r}
 
+aisc2024 <- read.csv("aisc2024.csv")
 
-### Week 9: Structure Analysis & Self-Similarity MAtrices
+aisc2024 |>                   # Start with the data
+  ggplot(                     # Set up the plot.
+    aes(
+      x = tempo,
+      y = arousal,
+      size = instrumentalness,
+      colour = danceability
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    x = 121,
+    y = 4.91,
+    label = "Onda Corta - Sud America",
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "center",         # Align vertical centre of label with the point.
+    angle = 30                # Rotate the text label
+  ) +
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(50, 200),
+    breaks = c(50, 100, 150, 200), # Specify grid lines
+    minor_breaks = NULL       # Remove 'minor' grid lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(1, 9),
+    breaks = c(1, 5, 9),
+    minor_breaks = NULL
+  ) +
+  scale_colour_viridis_c() +  # Use the popular viridis colour palette.
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud..
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "Tempo",
+    y = "Arousal",
+    colour = "Danceability"
+  )
 
-
-### Week 10: Key and Chord Estimation
-
-
-### Week 11: Beat Tracking
-
-
-### Week 12: Similarity & Classification and Clustering
-
-
-### Week 13: Exam and Final Portfolio
-
+```
