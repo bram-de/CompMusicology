@@ -13,7 +13,55 @@ library(tidyverse)
 source("compmus.R")
 ```
 
-### Key and Chord Estimation (Newest Tab)
+
+
+### Novelty Function (Newest Tab 1)
+
+```{r}
+
+"features/bram-d-1.json" |>
+  compmus_energy_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Energy Novelty")
+
+
+```
+
+
+### Spectral Novelty Function (Newest Tab 2)
+
+```{r}
+
+"features/bram-d-1.json" |>
+  compmus_spectral_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Spectral Novelty")
+
+
+```
+
+### Tempogram (Newest Tab 3)
+
+This tab features a tempogram of my first track, which happens to be 80 BPM. Because of this, even in the wrapped tempogram, it shows yellow lines on both 80BPM AND its tempo harmonic 160 BPM.
+
+```{r}
+
+"features/bram-d-1.json" |>
+  compmus_tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
+
+```
+
+
+### Key and Chord Estimation
 
 The keygram in this tab shows 5 rows that are noticeably darker than other rows: G major, C major, F major, C minor and F minor. Out of these 5, C major is the darkest, which means that the model estimates that the song is in C major. 
 
