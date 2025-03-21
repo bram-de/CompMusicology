@@ -10,12 +10,114 @@ output:
 knitr::opts_chunk$set(echo = FALSE)
 library(plotly)
 library(tidyverse)
+library(tidymodels)
+library(ggdendro)
+library(heatmaply)
 source("compmus.R")
+
+get_conf_mat <- function(fit) {
+  outcome <- .get_tune_outcome_names(fit)
+  fit |> 
+    collect_predictions() |> 
+    conf_mat(truth = outcome, estimate = .pred_class)
+}  
+
+get_pr <- function(fit) {
+  fit |> 
+    conf_mat_resampled() |> 
+    group_by(Prediction) |> mutate(precision = Freq / sum(Freq)) |> 
+    group_by(Truth) |> mutate(recall = Freq / sum(Freq)) |> 
+    ungroup() |> filter(Prediction == Truth) |> 
+    select(class = Prediction, precision, recall)
+}  
+
+```
+### Clustering without heatmap (new tab 1)
+
+
+```{r}
+compmus2025 <- read_csv("compmus2025.csv")
+
+cluster_juice <-
+  recipe(
+    filename ~
+      arousal +
+      danceability +
+      instrumentalness +
+      tempo +
+      valence,
+    data = compmus2025
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |> 
+  #step_range(all_predictors()) |> 
+  prep(compmus2025) |>
+  juice() |>
+  column_to_rownames("filename")
+
+compmus_dist <- dist(cluster_juice, method = "euclidean")
+
+compmus_dist |> 
+  hclust(method = "complete") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram()
+
+```
+### Clustering with heatmap (new tab 2)
+
+```{r}
+
+heatmaply(
+  cluster_juice,
+  hclustfun = hclust,
+  hclust_method = "complete",  # Change for single, average, or complete linkage.
+  dist_method = "euclidean"
+)
+```
+
+
+### Clustering (is it AI or not?)
+
+```{r}
+compmus2025_filtered <- 
+  compmus2025 |> filter(!is.na(ai)) |> 
+  mutate(ai = factor(if_else(ai, "AI", "Non-AI")))
+
+classification_recipe <-
+  recipe(
+    ai ~
+      arousal +
+      danceability +
+      instrumentalness +
+      tempo +
+      valence,
+    data = compmus2025_filtered
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors())      # Converts to z-scores.
+  # step_range(all_predictors())    # Sets range to [0, 1].
+
+compmus_cv <- compmus2025_filtered |> vfold_cv(5)
+
+knn_model <-
+  nearest_neighbor(neighbors = 1) |>
+  set_mode("classification") |> 
+  set_engine("kknn")
+classification_knn <- 
+  workflow() |> 
+  add_recipe(classification_recipe) |> 
+  add_model(knn_model) |> 
+  fit_resamples(compmus_cv, control = control_resamples(save_pred = TRUE))
+
+classification_knn |> get_conf_mat()
+
+classification_knn |> get_conf_mat() |> autoplot(type = "mosaic")
+
 ```
 
 
 
-### Novelty Function (Newest Tab 1)
+### Novelty Function
 
 ```{r}
 
@@ -30,7 +132,7 @@ source("compmus.R")
 ```
 
 
-### Spectral Novelty Function (Newest Tab 2)
+### Spectral Novelty Function
 
 ```{r}
 
@@ -44,7 +146,7 @@ source("compmus.R")
 
 ```
 
-### Tempogram (Newest Tab 3)
+### Tempogram
 
 This tab features a tempogram of my first track, which happens to be 80 BPM. Because of this, even in the wrapped tempogram, it shows yellow lines on both 80BPM AND its tempo harmonic 160 BPM.
 
