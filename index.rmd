@@ -38,7 +38,6 @@ get_pr <- function(fit) {
 
 
 ```{r}
-print("test")
 ```
 
 Artifical intelligence (often shortened to AI) is becoming ever more widely used in the context of music creation. With many different tools available from multiple different companies, it has become easier than ever for anyone to create their own music. A filmmaker can ask for soft cinematic soundscapes to enhance the feeling of a scene, rappers wanting an agressive beat to record their lyrics over may prompt AI to generate a beat in te style of their biggest inspirations, or students who want some relaxing background music can generate exactly that. In order to do this, people simply type a prompt, such as 'fast techno music for workout' or 'swing jazz containing a saxophone solo over the chords D minor, G7 and C', and the AI model will generate a piece of music based on this input. Because of this, the given prompt is of crucial importance for the final result.
@@ -302,6 +301,8 @@ The second self-similarity matrix shows dark blue rectangles that are a lot bigg
 
 
 ```
+
+
 The two graphs above show for every moment in the song how much new energy there is when compared to the moment before it. This is called an energy-based novelty function and it can also be used to analyze the structure of a a song.
 
 The energy-based novelty function for the first track shows has two characteristic properties, which are the peaks at the beginning and the regular pattern afterwards. The spikes at the start stem from the fact that this song starts with a relatively quiet intro featuring just piano, so when the hihats and snare come in after 12 seconds that causes the largest relative change in energy in the entire track. Another 12 seconds later, the kick drum and bass join in, which causes another spike. However, since there already was a drum groove in the form of the hihats and snare, this change is smaller in comparison. Since the song does not really increase or decrease in energy after this point, the next peaks are all very similar.
@@ -364,15 +365,6 @@ aisc2024 |>                   # Start with the data
   ) +
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_text(                  # Add text labels from above.
-    x = 121,
-    y = 4.91,
-    label = "Onda Corta - Sud America",
-    size = 3,                 # Override size (not loudness here).
-    hjust = "left",           # Align left side of label with the point.
-    vjust = "center",         # Align vertical centre of label with the point.
-    angle = 30                # Rotate the text label
-  ) +
   scale_x_continuous(         # Fine-tune the x axis.
     limits = c(50, 200),
     breaks = c(50, 100, 150, 200), # Specify grid lines
@@ -506,6 +498,8 @@ classification_knn |> get_conf_mat() |> autoplot(type = "mosaic")
 
 classification_knn |> get_conf_mat()
 ```
+
+
 
 Most of the tracks in the corpus have been manually labeled as either AI or not AI. With this labeled dataset, it is possible to train a basic AI model to consider the features of an entry in the corpus to guess if it is AI-generated or not. The confusion matrix above is a helpful indicator of the reliability of these guesses. The rectangle and number on the top left represent the amount of AI-generated songs that the model accurately classified as such, the bottom left represent the AI-generated tracks that the model did not classify as such. The bottom right represents the non-AI tracks that were accurately classified as non-AI, and the top right represents the non-AI tracks that were falsely classified as AI. As you can see, the model actually performed a lot more successful classifications than unsuccessful ones.  
 
