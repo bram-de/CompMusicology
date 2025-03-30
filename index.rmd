@@ -32,123 +32,40 @@ get_pr <- function(fit) {
 }  
 
 ```
-### Clustering without heatmap (new tab 1)
+
+
+### Introduction
 
 
 ```{r}
-compmus2025 <- read_csv("compmus2025.csv")
-
-cluster_juice <-
-  recipe(
-    filename ~
-      arousal +
-      danceability +
-      instrumentalness +
-      tempo +
-      valence,
-    data = compmus2025
-  ) |>
-  step_center(all_predictors()) |>
-  step_scale(all_predictors()) |> 
-  #step_range(all_predictors()) |> 
-  prep(compmus2025) |>
-  juice() |>
-  column_to_rownames("filename")
-
-compmus_dist <- dist(cluster_juice, method = "euclidean")
-
-compmus_dist |> 
-  hclust(method = "complete") |> # Try single, average, and complete.
-  dendro_data() |>
-  ggdendrogram()
-
-```
-### Clustering with heatmap (new tab 2)
-
-```{r}
-
-heatmaply(
-  cluster_juice,
-  hclustfun = hclust,
-  hclust_method = "complete",  # Change for single, average, or complete linkage.
-  dist_method = "euclidean"
-)
+print("test")
 ```
 
+Artifical intelligence (often shortened to AI) is becoming ever more widely used in the context of music creation. With many different tools available from multiple different companies, it has become easier than ever for anyone to create their own music. A filmmaker can ask for soft cinematic soundscapes to enhance the feeling of a scene, rappers wanting an agressive beat to record their lyrics over may prompt AI to generate a beat in te style of their biggest inspirations, or students who want some relaxing background music can generate exactly that. In order to do this, people simply type a prompt, such as 'fast techno music for workout' or 'swing jazz containing a saxophone solo over the chords D minor, G7 and C', and the AI model will generate a piece of music based on this input. Because of this, the given prompt is of crucial importance for the final result.
 
-### Clustering (is it AI or not?)
+To test how well different prompts are handled, I created two pieces of music using Stable Audio and their Audiosparx 2.0 AI model. I quickly realized that some prompts work better than others. For example, a prompt for something very specific which has not been created before, say a combination of Dutch folk music and Tibetan throat singing, is way less likely to result in a convincing track than something more simple and common, such as a chill hiphop beat. I realized  this myself when I tried generating 4 songs using my own prompts, which unfortunately yielded unconvincing results. This is likely because I tried to test the limits of AI music generation with relatively unusual and specific prompts, such as Babymetal (a Japanese band combining K-pop and metal) and frenchcore (a specific subgenre of hardcore music with fast tempi and a strong offbeat bass). This already shows one of the weaknesses of AI-generated music: AI can only create music that is based on other music that already exists. Because of this, it will never create something groundbreaking, or even something innovative or unique for that matter.
 
-```{r}
-compmus2025_filtered <- 
-  compmus2025 |> filter(!is.na(ai)) |> 
-  mutate(ai = factor(if_else(ai, "AI", "Non-AI")))
+In order to give the AI model a test that it could more easily manage, I decided to browse the prompt libraries that Stable Audio offered. 
 
-classification_recipe <-
-  recipe(
-    ai ~
-      arousal +
-      danceability +
-      instrumentalness +
-      tempo +
-      valence,
-    data = compmus2025_filtered
-  ) |>
-  step_center(all_predictors()) |>
-  step_scale(all_predictors())      # Converts to z-scores.
-  # step_range(all_predictors())    # Sets range to [0, 1].
+To generate the first track, I used the prompt 
+  'Lofi hip hop beat, chillhop' 
+from the Chillhop prompt library. 
 
-compmus_cv <- compmus2025_filtered |> vfold_cv(5)
+To generate the second track, I used all of the promps from the Epic Rock prompt library, resulting in the final prompt 
+  'Post-Rock, Guitars, Drum Kit, Bass, Strings, Euphoric, Up-Lifting, Moody, Flowing, Raw, Epic, Sentimental, 125 BPM'.
 
-knn_model <-
-  nearest_neighbor(neighbors = 1) |>
-  set_mode("classification") |> 
-  set_engine("kknn")
-classification_knn <- 
-  workflow() |> 
-  add_recipe(classification_recipe) |> 
-  add_model(knn_model) |> 
-  fit_resamples(compmus_cv, control = control_resamples(save_pred = TRUE))
-
-classification_knn |> get_conf_mat()
-
-classification_knn |> get_conf_mat() |> autoplot(type = "mosaic")
-
-```
+The two resulting tracks were not perfect, as something still sounds a bit 'off' about them. However, they are good enough for further analysis, which is exactly what this dashboard is for. The two songs will be analyzed, compared to each other and compared to the tracks that other students submitted, in order to provide an insight into AI music generation.
 
 
 
-### Novelty Function
-
-```{r}
-
-"features/bram-d-1.json" |>
-  compmus_energy_novelty() |> 
-  ggplot(aes(t, novelty)) +
-  geom_line() +
-  theme_minimal() +
-  labs(x = "Time (s)", y = "Energy Novelty")
 
 
-```
 
 
-### Spectral Novelty Function
-
-```{r}
-
-"features/bram-d-1.json" |>
-  compmus_spectral_novelty() |> 
-  ggplot(aes(t, novelty)) +
-  geom_line() +
-  theme_minimal() +
-  labs(x = "Time (s)", y = "Spectral Novelty")
 
 
-```
+### Feature Analysis: Tempo
 
-### Tempogram
-
-This tab features a tempogram of my first track, which happens to be 80 BPM. Because of this, even in the wrapped tempogram, it shows yellow lines on both 80BPM AND its tempo harmonic 160 BPM.
 
 ```{r}
 
@@ -160,12 +77,30 @@ This tab features a tempogram of my first track, which happens to be 80 BPM. Bec
   labs(x = "Time (s)", y = "Tempo (BPM)") +
   theme_classic()
 
+"features/bram-d-2.json" |>
+  compmus_tempogram(window_size = 8, hop_size = 1, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", y = "Tempo (BPM)") +
+  theme_classic()
+
 ```
 
 
-### Key and Chord Estimation
+This tab features tempograms of the two tracks, which is a way to viusally show how fast or slow the song is at different points in time. People generally 'feel' tempi (the plural form of 'tempo') ranging from 80 to 160 beats per minute (BPM). If a song is much faster or slower than this, people will usually consider it half-time or double-time, meaning that the song goes half or twice as fast as the tempo that people feel it to be in. Because of this, these tempograms range from 80 to 160.
 
-The keygram in this tab shows 5 rows that are noticeably darker than other rows: G major, C major, F major, C minor and F minor. Out of these 5, C major is the darkest, which means that the model estimates that the song is in C major. 
+The tempo of the first song is exactly 80 BPM. Because of this, it shows yellow lines on both 80 BPM AND its tempo harmonic 160 BPM. (For every tempo there are also tempo harmonics, which is the speed double or triple the actual tempo. Usually this is not in the range of the diagram, but in this case it is.)The line at 160 is a brighter yellow than the one at 80bpm, which means that the computer would classify this track as 160 BPM. However, I think most people would agree that this is a slower song, and that 80 BPM is a more correct classification. I suspect that an important reason for this 'error' are the hihats that are playing eighth notes, which is 'twice as fast' as the beat of the song.
+
+The tempogram for the second track shows a very distinct line at 125 BPM. This is good, because 125 BPM was a part of the prompt that generated this song. The sudden drop in tempo at the 2.5 minute mark is really strange to me. Nothing really seems to change at that point in the song, so perhaps something is happening in the bass frequencies that are so low that humans cannot hear them.
+
+
+
+
+
+
+### Feature Analysis: Key
+
 
 ```{r}
 
@@ -250,8 +185,24 @@ key_templates <-
     "B:maj", circshift(major_key, 11),
     "D#:min", circshift(minor_key, 3)
   )
+```
+
+```{r}
 
 
+
+"features/bram-d-1.json" |> 
+  compmus_chroma(norm = "identity") |> 
+  compmus_match_pitch_templates(
+    key_templates,         # Change to chord_templates if desired
+    norm = "identity",       # Try different norms (and match it with what you used in `compmus_chroma`)
+    distance = "cosine"   # Try different distance metrics
+  ) |>
+  ggplot(aes(x = time, y = name, fill = d)) + 
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = "Template", fill = NULL) +
+  theme_classic()                                      # Change the theme?
 
 "features/bram-d-2.json" |> 
   compmus_chroma(norm = "identity") |> 
@@ -269,13 +220,26 @@ key_templates <-
 ```
 
 
-### Chroma-Based Self-Similarity Matrix
+Most western music is written in a certain key, which means that some notes are used in the song but others are not. For example, the key of C major consists of C, D, E, F, G, A, and B, which are all of the white keys on a piano.
 
-Below is a chroma-based self-similarity matrix of the second song I have submitted. The relatively dark square starting at about 65 seconds and spanning across the next 25 seconds or so represents the middle part of the track, signaling a relatively "stable" repeated part. After about 100 seconds, the track becomes more "chaotic" with most parts not resembling any other part of the track. The thick green line at the end/top tells us that the final 15 seconds of the track are completely different from any other parts before it, but the very dark square at the top right of the graph illustrates that this ending part is internally very consistent chroma-wise. In other words, the final few seconds of the track all sound very similar to eachother.
+
+
+The keygram for the first track seems to show that the information about the key of the song changes drastically after 24 seconds. (If you do not see this, is should become clear when resizing the table to be larger.) This is the exact moment in the song where the drums come in. However, the chord progression stays the same, so the keygram 'should' not change. In this case, the first part of the keygram is "correct". Since the intro of the track only features the piano, one of the main melodic instruments, this part gives the clearest representation of which key the song is in. Drums are a percussive instrument and not a melodic one, which means that drums do not play in a certain key. They do however fill up a very large part of the frequency spectrum, which interferes with the instruments that are actually useful when deciding the key of a track. 
+
+The keygram for the second track shows 5 rows that are noticeably darker than other rows: G major, C major, F major, C minor and F minor. This may seem like an arbitrary set of keys, but they are actually closely related. Most of the notes in C, G and F major are the same. C major simply means all of the white keys on a piano, and G and F both only differ from this by one note. G major features F# instead of F, and F major features Bb instead of B. The two minor keys, C minor and F minor, are the 'parallel minor' keys of C and F major, which means that they also share a lot of notes. Given this information, it is not surprising that the row for C major is generally the darkest, which means that the model estimates that the song is in C major.
+
+(Something else that may stand out about the second keygram is the grey column near the end. This is simply because there is complete silence at that section in the song, meaning that there is no sound to be analyzed.)
+
+
+
+
+
+
+### Structure-analysis: Chroma-Based Self-Similarity Matrix
 
 ```{r}
 
-"features/bram-d-2.json" |>                           # Change the track
+"features/bram-d-1.json" |>                           # Change the track
   compmus_chroma(norm = "identity") |>                 # Change the norm
   compmus_self_similarity(
     feature = pc,
@@ -287,21 +251,106 @@ Below is a chroma-based self-similarity matrix of the second song I have submitt
   labs(x = "Time (s)", y = NULL, fill = NULL) +
   theme_classic()                                      # Change the theme?
 
+"features/bram-d-2.json" |>                           # Change the track
+  compmus_chroma(norm = "identity") |>                 # Change the norm
+  compmus_self_similarity(
+    feature = pc,
+    distance = "euclidean"                             # Change the distance
+  ) |>   
+  ggplot(aes(x = xtime, y = ytime, fill = d)) + 
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +               # Change the colours?
+  labs(x = "Time (s)", y = NULL, fill = NULL) +
+  theme_classic()                  
+
 ```
 
 
-### Submissions
+The graphs above are self-similarity matrices based on chroma features for each of the two tracks. In simpler terms, these graphs show how much the notes in a certain section of the song are similar to the notes in every other section of the song. Dark blue means that the note sare very similar (so the dark blue diagonal line simply means that every moment in the song features exactly the same notes as that exact same moment), and green or even yellow means that two parts of the song do not contain similar notes at all.
 
-Using Stable Audio, after generating 4 songs using my own prompts yielded unconvincing results, I decided to stick to prompt libraries offered. Both songs were generated using the Stable Audio AudioSparx 2.0 model with a desired duration of 3 minutes. To generate the first track, I used the prompt “Lofi hip hop beat, chillhop” from the Chillhop prompt library. To generate the second track, I used all of the promps from the Epic Rock prompt library, resulting in the final prompt “Post-Rock, Guitars, Drum Kit, Bass, Strings, Euphoric, Up-Lifting, Moody, Flowing, Raw, Epic, Sentimental, 125 BPM”
+The difference between these two graph nicely illustrates (part of) what makes the structure of the two songs so different. The first graph shows a very small checkerboard pattern repeated many times, meaning that note changes happen very often, and that these relatively short loops are repeated throughout the entire track. This is typical of of this kind of music. Repeating the same thing over and over again allows the mind to get used to it, allowing the music to fade into the background and not interfere with things like homework or reading. That is why this type of music is popular as background music to help you focus.
+
+The second self-similarity matrix shows dark blue rectangles that are a lot bigger, showing that notes are being held for longer. This graph also shows less of an obvious pattern, meaning that the track is less repetitive. This also makes sense given the prompt. In order for something to be euphoric, epic or sentimental, the song need to have enough space for the listener to feel those emotions without being distracted by very busy music (hence the long notes), but it is also necessary to keep the listener engaged during the entirety of the track, which is why the structure here is less repetitive. After all, the more something is repeated, the more people get used to it and it loses its impact. 
 
 
 
-### Visualization old
+
+
+
+
+
+
+
+
+### Structure Analysis: Energy-Based Novelty Function
+
+```{r}
+
+"features/bram-d-1.json" |>
+  compmus_energy_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Energy Novelty")
+
+"features/bram-d-2.json" |>
+  compmus_energy_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Energy Novelty")
+
+
+```
+The two graphs above show for every moment in the song how much new energy there is when compared to the moment before it. This is called an energy-based novelty function and it can also be used to analyze the structure of a a song.
+
+The energy-based novelty function for the first track shows has two characteristic properties, which are the peaks at the beginning and the regular pattern afterwards. The spikes at the start stem from the fact that this song starts with a relatively quiet intro featuring just piano, so when the hihats and snare come in after 12 seconds that causes the largest relative change in energy in the entire track. Another 12 seconds later, the kick drum and bass join in, which causes another spike. However, since there already was a drum groove in the form of the hihats and snare, this change is smaller in comparison. Since the song does not really increase or decrease in energy after this point, the next peaks are all very similar.
+
+The regularity of the peaks is also no coincident. The peaks on the graph happen every 4 bars, which coincides with the length of the piano loop. In other words, the peaks show every time that the piano loop, but also de drum loop and the bassline repeat. Since The kick drum, bass and piano chord all play at the same time on those first beats, every first beat of a loop causes a spike in the novelty function.
+
+
+
+### Structure Analysis: Spectral Novelty Function
+
+```{r}
+
+"features/bram-d-1.json" |>
+  compmus_spectral_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Spectral Novelty")
+
+"features/bram-d-2.json" |>
+  compmus_spectral_novelty() |> 
+  ggplot(aes(t, novelty)) +
+  geom_line() +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "Spectral Novelty")
+
+```
+
+
+
+
+The graphs above are by far the most chaotic-looking graphs on this dashboard. They show a spectral novelty function, meaning that for each moment in the track, they compare how different the timbre is from the timbre of the previous moment. A possible reason for these graphs being so full of sudden changes might be the fact that AI music generation works largely on a frame by frame basis. This means that the tracks are created moment by moment, instead of by section for example. This is also called bottom-up processing, in which the smallest possible components eventually end up creating something bigger, whereas human musicians (at least in some way) always work top-down, which means starting from a larger idea and then playing the right notes to bring that idea to life.
+
+Besides this, there are two things that can be said about the second graph. When the music fades to silence, the novelty falls and eventually reaches zero. This just means that whenever music goes silent, nothing changes when the music stays silent. Because some quiet artifacts are generated after this period of silence, there is a final spike after the silence, because the file goes from silence to sound, which is a big difference.
+
+
+
+
+
+
+
+### Corpus: Visualization
 
 
 ```{r}
 
 aisc2024 <- read.csv("compmus2025.csv")
+
+ggplotly(
 
 aisc2024 |>                   # Start with the data
   ggplot(                     # Set up the plot.
@@ -309,7 +358,8 @@ aisc2024 |>                   # Start with the data
       x = tempo,
       y = arousal,
       size = instrumentalness,
-      colour = danceability
+      colour = danceability,
+      shape = ai
     )
   ) +
   geom_point() +              # Scatter plot.
@@ -344,5 +394,119 @@ aisc2024 |>                   # Start with the data
     y = "Arousal",
     colour = "Danceability"
   )
+)
+```
+
+
+I am not the only person who has submitted music for this course. In fact, the songs I created are part of a corpus that includes over a hundred tracks. Using Essentia, which is an open-source code library for music analysis, each track in the corpus gets scored on the following features: approachability, arousal, danceability, engagingness, instrumentalness, valence and tempo. The interactive graph above provides an overview of the different tracks and their features. Hovering over a data point with your mouse provides you with additional information about the tracks.
+
+Most tracks have also manually been labeled as either AI-generated or not AI, which is indicated by the shapes of the datapoints.
+
+
+
+
+
+
+
+### Clustering without heatmap
+
+
+```{r}
+compmus2025 <- read_csv("compmus2025.csv")
+
+cluster_juice <-
+  recipe(
+    filename ~
+      arousal +
+      danceability +
+      instrumentalness +
+      tempo +
+      valence +
+      engagingness,
+    data = compmus2025
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |> 
+  #step_range(all_predictors()) |> 
+  prep(compmus2025) |>
+  juice() |>
+  column_to_rownames("filename")
+
+compmus_dist <- dist(cluster_juice, method = "euclidean")
+
+compmus_dist |> 
+  hclust(method = "complete") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram()
 
 ```
+
+
+
+It is possible to run a computer model to see how a computer would cluster the different tracks. That means the computer will try to group similar tracks together, such as "all tracks with a high tempo and low valence" or "all tracks which have a high arousal rate when compared to their instrumentalness". The graph above shows how the model would split the corpus into two different groups, which are then split into groups again and again. 
+
+
+
+### Clustering with heatmap 
+
+```{r}
+
+heatmaply(
+  cluster_juice,
+  hclustfun = hclust,
+  hclust_method = "complete",  # Change for single, average, or complete linkage.
+  dist_method = "euclidean"
+)
+```
+
+
+
+The dendrogram on the previous page looks interesting, but it is very difficult to see what actually 'unites' the groups that the model created. That is why pairing a dendrogram with a heatmap may be a good idea. This way, you get a visual representation of all of the grouping and also of the scores for every track. This makes it possible to say something about the properties of the songs in a group (very broadly, mind you). For example, the biggest split seems to be between tracks which have relatively high engagingness, arousal, valence and danceability but low instrumentallness in one group, and tracks that have a relatively low engagingness, arousal, valence ands danceability but high instrumentalness in the other group. Further grouping of the high instrumentalness group seems to be based on high vs low tempo, etc.
+
+Intuitively this makes sense, since arousal, engagingness and danceability for example seem like they belong together, and since people are communicative creatures by nature it is also not surprising that music that is just instrumental is less engaging/arousing for us than songs that feature vocals.
+
+Curiously, the model also seems to have made a distinction between purely 'physical' properties of the music itself on the one hand (instrumentalness and tempo), and properties relating to the human perception of music on the other (engagingness, arousal, valence, danceability). Unfortunately there is no way to verify what is actually at the basis for this distinction, so it is very well possible that this is just a coincidence.
+
+
+
+### Clustering (is it AI or not?)
+
+```{r}
+compmus2025_filtered <- 
+  compmus2025 |> filter(!is.na(ai)) |> 
+  mutate(ai = factor(if_else(ai, "AI", "Non-AI")))
+
+classification_recipe <-
+  recipe(
+    ai ~
+      arousal +
+      danceability +
+      instrumentalness +
+      tempo +
+      valence,
+    data = compmus2025_filtered
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors())      # Converts to z-scores.
+  # step_range(all_predictors())    # Sets range to [0, 1].
+
+compmus_cv <- compmus2025_filtered |> vfold_cv(5)
+
+knn_model <-
+  nearest_neighbor(neighbors = 1) |>
+  set_mode("classification") |> 
+  set_engine("kknn")
+classification_knn <- 
+  workflow() |> 
+  add_recipe(classification_recipe) |> 
+  add_model(knn_model) |> 
+  fit_resamples(compmus_cv, control = control_resamples(save_pred = TRUE))
+
+classification_knn |> get_conf_mat() |> autoplot(type = "mosaic")
+
+classification_knn |> get_conf_mat()
+```
+
+Most of the tracks in the corpus have been manually labeled as either AI or not AI. With this labeled dataset, it is possible to train a basic AI model to consider the features of an entry in the corpus to guess if it is AI-generated or not. The confusion matrix above is a helpful indicator of the reliability of these guesses. The rectangle and number on the top left represent the amount of AI-generated songs that the model accurately classified as such, the bottom left represent the AI-generated tracks that the model did not classify as such. The bottom right represents the non-AI tracks that were accurately classified as non-AI, and the top right represents the non-AI tracks that were falsely classified as AI. As you can see, the model actually performed a lot more successful classifications than unsuccessful ones.  
+
+
