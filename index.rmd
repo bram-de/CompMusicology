@@ -32,13 +32,14 @@ get_pr <- function(fit) {
 }  
 
 ```
-
-
-### Introduction
+Introduction {.storyboard}
+=====================
 
 
 ```{r}
 ```
+
+### Introduction
 
 Artifical intelligence (often shortened to AI) is becoming ever more widely used in the context of music creation. With many different tools available from multiple different companies, it has become easier than ever for anyone to create their own music. A filmmaker can ask for soft cinematic soundscapes to enhance the feeling of a scene, rappers wanting an agressive beat to record their lyrics over may prompt AI to generate a beat in te style of their biggest inspirations, or students who want some relaxing background music can generate exactly that. In order to do this, people simply type a prompt, such as 'fast techno music for workout' or 'swing jazz containing a saxophone solo over the chords D minor, G7 and C', and the AI model will generate a piece of music based on this input. Because of this, the given prompt is of crucial importance for the final result.
 
@@ -55,15 +56,23 @@ To generate the second track, I used all of the promps from the Epic Rock prompt
 
 The two resulting tracks were not perfect, as something still sounds a bit 'off' about them. However, they are good enough for further analysis, which is exactly what this dashboard is for. The two songs will be analyzed, compared to each other and compared to the tracks that other students submitted, in order to provide an insight into AI music generation.
 
+### Contents
+
+The tab 'Feature Analysis' shows two features for the tracks that stay consistent throughout the entire length of the songs.
+
+The tab 'Structure Analysis' shows three ways of analyzing the similarities and differences between different parts of the music. This can give an insight in the structure of the song, and answers questions such as "Does the intro part appear anywhere else in the song?" or "Does the track alternate between two main sections, such as in a verse-chorus-verse-chorus structure?"
+
+The tab 'Class Corpus' shows different ways to visualize and group the entire collection of music that students of this course have submitted during this block, and even a computer model that makes predictions about whether each submission is AI-generated or not.
 
 
 
 
+Feature Analysis {.storyboard}
+=====================
 
 
 
-
-### Feature Analysis: Tempo
+### Tempo
 
 
 ```{r}
@@ -86,10 +95,10 @@ The two resulting tracks were not perfect, as something still sounds a bit 'off'
 
 ```
 
-
+***
 This tab features tempograms of the two tracks, which is a way to viusally show how fast or slow the song is at different points in time. People generally 'feel' tempi (the plural form of 'tempo') ranging from 80 to 160 beats per minute (BPM). If a song is much faster or slower than this, people will usually consider it half-time or double-time, meaning that the song goes half or twice as fast as the tempo that people feel it to be in. Because of this, these tempograms range from 80 to 160.
 
-The tempo of the first song is exactly 80 BPM. Because of this, it shows yellow lines on both 80 BPM AND its tempo harmonic 160 BPM. (For every tempo there are also tempo harmonics, which is the speed double or triple the actual tempo. Usually this is not in the range of the diagram, but in this case it is.)The line at 160 is a brighter yellow than the one at 80bpm, which means that the computer would classify this track as 160 BPM. However, I think most people would agree that this is a slower song, and that 80 BPM is a more correct classification. I suspect that an important reason for this 'error' are the hihats that are playing eighth notes, which is 'twice as fast' as the beat of the song.
+The tempo of the first song is exactly 80 BPM. Because of this, it shows yellow lines on both 80 BPM and its tempo harmonic 160 BPM. (For every tempo there are also tempo harmonics, which is the speed double or triple the actual tempo. Usually this is not in the range of the diagram, but in this case it is.)The line at 160 is a brighter yellow than the one at 80bpm, which means that the computer would classify this track as 160 BPM. However, I think most people would agree that this is a slower song, and that 80 BPM is a more correct classification. I suspect that an important reason for this 'error' are the hihats that are playing eighth notes, which is 'twice as fast' as the beat of the song.
 
 The tempogram for the second track shows a very distinct line at 125 BPM. This is good, because 125 BPM was a part of the prompt that generated this song. The sudden drop in tempo at the 2.5 minute mark is really strange to me. Nothing really seems to change at that point in the song, so perhaps something is happening in the bass frequencies that are so low that humans cannot hear them.
 
@@ -98,7 +107,7 @@ The tempogram for the second track shows a very distinct line at 125 BPM. This i
 
 
 
-### Feature Analysis: Key
+### Key
 
 
 ```{r}
@@ -218,10 +227,8 @@ key_templates <-
 
 ```
 
-
+***
 Most western music is written in a certain key, which means that some notes are used in the song but others are not. For example, the key of C major consists of C, D, E, F, G, A, and B, which are all of the white keys on a piano.
-
-
 
 The keygram for the first track seems to show that the information about the key of the song changes drastically after 24 seconds. (If you do not see this, is should become clear when resizing the table to be larger.) This is the exact moment in the song where the drums come in. However, the chord progression stays the same, so the keygram 'should' not change. In this case, the first part of the keygram is "correct". Since the intro of the track only features the piano, one of the main melodic instruments, this part gives the clearest representation of which key the song is in. Drums are a percussive instrument and not a melodic one, which means that drums do not play in a certain key. They do however fill up a very large part of the frequency spectrum, which interferes with the instruments that are actually useful when deciding the key of a track. 
 
@@ -231,10 +238,11 @@ The keygram for the second track shows 5 rows that are noticeably darker than ot
 
 
 
+Structure Analysis {.storyboard}
+=====================
 
 
-
-### Structure-analysis: Chroma-Based Self-Similarity Matrix
+### Chroma-Based Self-Similarity Matrix
 
 ```{r}
 
@@ -264,8 +272,8 @@ The keygram for the second track shows 5 rows that are noticeably darker than ot
 
 ```
 
-
-The graphs above are self-similarity matrices based on chroma features for each of the two tracks. In simpler terms, these graphs show how much the notes in a certain section of the song are similar to the notes in every other section of the song. Dark blue means that the note sare very similar (so the dark blue diagonal line simply means that every moment in the song features exactly the same notes as that exact same moment), and green or even yellow means that two parts of the song do not contain similar notes at all.
+***
+The graphs here are self-similarity matrices based on chroma features for each of the two tracks. In simpler terms, these graphs show how much the notes in a certain section of the song are similar to the notes in every other section of the song. Dark blue means that the note sare very similar (so the dark blue diagonal line simply means that every moment in the song features exactly the same notes as that exact same moment), and green or even yellow means that two parts of the song do not contain similar notes at all.
 
 The difference between these two graph nicely illustrates (part of) what makes the structure of the two songs so different. The first graph shows a very small checkerboard pattern repeated many times, meaning that note changes happen very often, and that these relatively short loops are repeated throughout the entire track. This is typical of of this kind of music. Repeating the same thing over and over again allows the mind to get used to it, allowing the music to fade into the background and not interfere with things like homework or reading. That is why this type of music is popular as background music to help you focus.
 
@@ -281,7 +289,7 @@ The second self-similarity matrix shows dark blue rectangles that are a lot bigg
 
 
 
-### Structure Analysis: Energy-Based Novelty Function
+### Energy-Based Novelty Function
 
 ```{r}
 
@@ -302,8 +310,8 @@ The second self-similarity matrix shows dark blue rectangles that are a lot bigg
 
 ```
 
-
-The two graphs above show for every moment in the song how much new energy there is when compared to the moment before it. This is called an energy-based novelty function and it can also be used to analyze the structure of a a song.
+***
+The two graphs here show for every moment in the song how much new energy there is when compared to the moment before it. This is called an energy-based novelty function and it can also be used to analyze the structure of a a song.
 
 The energy-based novelty function for the first track shows has two characteristic properties, which are the peaks at the beginning and the regular pattern afterwards. The spikes at the start stem from the fact that this song starts with a relatively quiet intro featuring just piano, so when the hihats and snare come in after 12 seconds that causes the largest relative change in energy in the entire track. Another 12 seconds later, the kick drum and bass join in, which causes another spike. However, since there already was a drum groove in the form of the hihats and snare, this change is smaller in comparison. Since the song does not really increase or decrease in energy after this point, the next peaks are all very similar.
 
@@ -311,7 +319,7 @@ The regularity of the peaks is also no coincident. The peaks on the graph happen
 
 
 
-### Structure Analysis: Spectral Novelty Function
+### Spectral Novelty Function
 
 ```{r}
 
@@ -333,18 +341,19 @@ The regularity of the peaks is also no coincident. The peaks on the graph happen
 
 
 
-
-The graphs above are by far the most chaotic-looking graphs on this dashboard. They show a spectral novelty function, meaning that for each moment in the track, they compare how different the timbre is from the timbre of the previous moment. A possible reason for these graphs being so full of sudden changes might be the fact that AI music generation works largely on a frame by frame basis. This means that the tracks are created moment by moment, instead of by section for example. This is also called bottom-up processing, in which the smallest possible components eventually end up creating something bigger, whereas human musicians (at least in some way) always work top-down, which means starting from a larger idea and then playing the right notes to bring that idea to life.
+***
+These two graphs are by far the most chaotic-looking graphs on this dashboard. They show a spectral novelty function, meaning that for each moment in the track, they compare how different the timbre is from the timbre of the previous moment. A possible reason for these graphs being so full of sudden changes might be the fact that AI music generation works largely on a frame by frame basis. This means that the tracks are created moment by moment, instead of by section for example. This is also called bottom-up processing, in which the smallest possible components eventually end up creating something bigger, whereas human musicians (at least in some way) always work top-down, which means starting from a larger idea and then playing the right notes to bring that idea to life.
 
 Besides this, there are two things that can be said about the second graph. When the music fades to silence, the novelty falls and eventually reaches zero. This just means that whenever music goes silent, nothing changes when the music stays silent. Because some quiet artifacts are generated after this period of silence, there is a final spike after the silence, because the file goes from silence to sound, which is a big difference.
 
 
 
 
+Class Corpus {.storyboard}
+=====================
 
 
-
-### Corpus: Visualization
+### Visualization
 
 
 ```{r}
@@ -366,19 +375,18 @@ aisc2024 |>                   # Start with the data
   geom_point() +              # Scatter plot.
   geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
   scale_x_continuous(         # Fine-tune the x axis.
-    limits = c(50, 200),
-    breaks = c(50, 100, 150, 200), # Specify grid lines
+    limits = c(50, 175),
+    breaks = c(50, 75, 100, 125, 150, 175), # Specify grid lines
     minor_breaks = NULL       # Remove 'minor' grid lines.
   ) +
   scale_y_continuous(         # Fine-tune the y axis in the same way.
-    limits = c(1, 9),
-    breaks = c(1, 5, 9),
+    limits = c(3,6),
+    breaks = c(3, 4, 5, 6),
     minor_breaks = NULL
   ) +
   scale_colour_viridis_c() +  # Use the popular viridis colour palette.
   scale_size_continuous(      # Fine-tune the sizes of each point.
-    trans = "exp",            # Use an exp transformation to emphasise loud..
-    guide = "none"            # Remove the legend for size.
+    trans = "exp"            # Use an exp transformation to emphasise loud..
   ) +
   theme_light() +             # Use a simpler theme.
   labs(                       # Make the titles nice.
@@ -389,8 +397,8 @@ aisc2024 |>                   # Start with the data
 )
 ```
 
-
-I am not the only person who has submitted music for this course. In fact, the songs I created are part of a corpus that includes over a hundred tracks. Using Essentia, which is an open-source code library for music analysis, each track in the corpus gets scored on the following features: approachability, arousal, danceability, engagingness, instrumentalness, valence and tempo. The interactive graph above provides an overview of the different tracks and their features. Hovering over a data point with your mouse provides you with additional information about the tracks.
+***
+I am not the only person who has submitted music for this course. In fact, the songs I created are part of a corpus that includes over a hundred tracks. Using Essentia, which is an open-source code library for music analysis, each track in the corpus gets scored on the following features: approachability, arousal, danceability, engagingness, instrumentalness, valence and tempo. The interactive graph on this page provides an overview of the different tracks and their features. Hovering over a data point with your mouse provides you with additional information about the tracks.
 
 Most tracks have also manually been labeled as either AI-generated or not AI, which is indicated by the shapes of the datapoints.
 
@@ -400,7 +408,7 @@ Most tracks have also manually been labeled as either AI-generated or not AI, wh
 
 
 
-### Clustering without heatmap
+### Clustering 
 
 
 ```{r}
@@ -434,12 +442,12 @@ compmus_dist |>
 ```
 
 
-
+***
 It is possible to run a computer model to see how a computer would cluster the different tracks. That means the computer will try to group similar tracks together, such as "all tracks with a high tempo and low valence" or "all tracks which have a high arousal rate when compared to their instrumentalness". The graph above shows how the model would split the corpus into two different groups, which are then split into groups again and again. 
 
 
 
-### Clustering with heatmap 
+### Clustering with Heatmap 
 
 ```{r}
 
@@ -452,7 +460,7 @@ heatmaply(
 ```
 
 
-
+***
 The dendrogram on the previous page looks interesting, but it is very difficult to see what actually 'unites' the groups that the model created. That is why pairing a dendrogram with a heatmap may be a good idea. This way, you get a visual representation of all of the grouping and also of the scores for every track. This makes it possible to say something about the properties of the songs in a group (very broadly, mind you). For example, the biggest split seems to be between tracks which have relatively high engagingness, arousal, valence and danceability but low instrumentallness in one group, and tracks that have a relatively low engagingness, arousal, valence ands danceability but high instrumentalness in the other group. Further grouping of the high instrumentalness group seems to be based on high vs low tempo, etc.
 
 Intuitively this makes sense, since arousal, engagingness and danceability for example seem like they belong together, and since people are communicative creatures by nature it is also not surprising that music that is just instrumental is less engaging/arousing for us than songs that feature vocals.
@@ -461,7 +469,7 @@ Curiously, the model also seems to have made a distinction between purely 'physi
 
 
 
-### Clustering (is it AI or not?)
+### Classification (AI or Not?)
 
 ```{r}
 compmus2025_filtered <- 
@@ -500,7 +508,7 @@ classification_knn |> get_conf_mat()
 ```
 
 
-
-Most of the tracks in the corpus have been manually labeled as either AI or not AI. With this labeled dataset, it is possible to train a basic AI model to consider the features of an entry in the corpus to guess if it is AI-generated or not. The confusion matrix above is a helpful indicator of the reliability of these guesses. The rectangle and number on the top left represent the amount of AI-generated songs that the model accurately classified as such, the bottom left represent the AI-generated tracks that the model did not classify as such. The bottom right represents the non-AI tracks that were accurately classified as non-AI, and the top right represents the non-AI tracks that were falsely classified as AI. As you can see, the model actually performed a lot more successful classifications than unsuccessful ones.  
+***
+Most of the tracks in the corpus have been manually labeled as either AI or not AI. With this labeled dataset, it is possible to train a basic AI model to consider the features of an entry in the corpus to guess if it is AI-generated or not. The confusion matrix on this page is a helpful indicator of the reliability of these guesses. The rectangle and number on the top left represent the amount of AI-generated songs that the model accurately classified as such, the bottom left represent the AI-generated tracks that the model did not classify as such. The bottom right represents the non-AI tracks that were accurately classified as non-AI, and the top right represents the non-AI tracks that were falsely classified as AI. As you can see, the model actually performed a lot more successful classifications than unsuccessful ones.  
 
 
